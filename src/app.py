@@ -56,14 +56,14 @@ def main():
     # Load the dataset
     st.sidebar.header('Upload Data')
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
-    st.sidebar.markdown("""---""") 
+    st.sidebar.markdown("""---""")
 
     # Display the dataset
     if uploaded_file is not None:
         st.sidebar.write('File uploaded successfully!')
-        st.sidebar.markdown("""---""") 
+        st.sidebar.markdown("""---""")
         df = pd.read_csv(uploaded_file)
-        st.markdown("""---""") 
+        st.markdown("""---""")
         st.subheader('Your Dataset: ')
         st.write(df.head())
 
@@ -71,22 +71,22 @@ def main():
         if 'df' not in st.session_state:
             st.session_state.df = df
 
-        st.markdown("""---""") 
+        st.markdown("""---""")
         # Display the dataset shape
         st.subheader('Dataset Shape: ')
         st.write("The number of features in the dataset are: ", st.session_state.df.shape[1])
         st.write("The number of samples in the dataset are: ", st.session_state.df.shape[0])
-        st.markdown("""---""") 
+        st.markdown("""---""")
 
         # Display the dataset columns
         st.subheader('Dataset Columns: ')
         st.write('The dataset columns are: ', st.session_state.df.columns)
-        st.markdown("""---""") 
+        st.markdown("""---""")
 
         # Display the dataset summary
         st.subheader('Basic Dataset Summary: ')
         st.write('The dataset summary is: ', st.session_state.df.describe())
-        st.markdown("""---""") 
+        st.markdown("""---""")
 
         # Display columns with missing values
         st.subheader('Columns with Missing Values: ')
@@ -101,14 +101,13 @@ def main():
         sns.heatmap(df_corr.isnull(), cbar=False)
         st.pyplot(fig)
 
-        st.markdown("""---""") 
+        st.markdown("""---""")
 
-        
 
         #Plot and highlight Outliers in the user selected column
         st.sidebar.header('Outliers')
         st.sidebar.write('Outliers are the data points that are significantly different from the other data points in the dataset. The outliers can be detected by plotting the data points in the column selected by the user. The user can select the column and the method to detect the outliers.')
-        column_outliers = st.sidebar.selectbox('Select Column', options=st.session_state.df.columns.tolist())       
+        column_outliers = st.sidebar.selectbox('Select Column', options=st.session_state.df.columns.tolist())
         method_outliers = st.sidebar.radio(f'How to detect outliers in {column_outliers}', options=['Z-Score', 'IQR'])
         if st.sidebar.button('Detect Outliers', key='detect_outliers'):
             st.subheader('Outliers')
@@ -133,7 +132,7 @@ def main():
                     st.pyplot(fig)
                 else:
                     st.write('Invalid Method')
-        st.sidebar.markdown("""---""") 
+        st.sidebar.markdown("""---""")
 
 
         #Creating Buttons to choose the method of handling missing values
@@ -141,7 +140,7 @@ def main():
         st.sidebar.write("Missing values can be dealt with by filling them with the mean, median, mode or by dropping the column. There is also an option to use KNN Imputer to handle missing values.")
         missing_values = df.isnull().sum()
         missing_columns = missing_values[missing_values > 0].index.tolist()
-        
+
         if missing_columns:
             column = st.sidebar.selectbox('Select Column', options=missing_columns)
             method = st.sidebar.radio(f'How to handle missing values in {column}', options=['Fill with Mean', 'Fill with Median', 'Fill with Mode', 'Drop Column'])
@@ -150,9 +149,7 @@ def main():
                 st.session_state.column = column
             if 'method' not in st.session_state:
                 st.session_state.method = method
-            
-    
-            #st.write(st.session_state.df.head())
+
             if st.sidebar.button("Handle Missing Values" , key='handle_missing_values'):
                 if method == 'Fill with Mean':
                     st.session_state.df[column].fillna(df[column].mean(), inplace=True)
@@ -165,9 +162,8 @@ def main():
                 else:
                     st.write('Invalid Method')
 
-                # Display the number of missing values in the column after handling
                 st.write(f'The data set after handling missing values is', st.session_state.df.head())
-            st.sidebar.markdown("""---""") 
+            st.sidebar.markdown("""---""")
 
 
         # Use KNNImputer to handle missing values
@@ -175,49 +171,46 @@ def main():
         n_neighbors = st.sidebar.slider('Number of Neighbors', min_value=1, max_value=10)
         if st.sidebar.button("Handle Missing Values with KNN Imputer", key='handle_missing_values_knn'):
             df = KNN_missing_values(st.session_state.df, n_neighbors)
-            #st.write('The number of missing values in the dataset after handling are: ', st.session_state.df.isnull().sum().sum())
             st.write('The dataset after handling missing values is: ', st.session_state.df.head())
-        st.sidebar.markdown("""---""") 
-        
+        st.sidebar.markdown("""---""")
+
 
         if st.sidebar.button('Reset Data', key='reset_data'):
             st.session_state.df = df
             st.write('Data has been reset successfully!')
             st.write(st.session_state.df.head())
-        st.sidebar.markdown("""---""") 
+        st.sidebar.markdown("""---""")
 
 
         st.sidebar.header('Data Visualization')
-        #Drop down menu to select the categorical colums in the dataset
         st.sidebar.subheader('Select Categorical Columns')
         st.sidebar.write('Categories are the columns which have a fixed number of unique values. For example sex of a person can or type of a product can be termed as a category. The categories are plotted on the y-axis and the numerical columns are plotted on the x-axis. Only a bar graph can be plotted for categorical columns.')
         categorical_columns = st.sidebar.multiselect('Select Columns', options=st.session_state.df.columns.tolist())
         numerical_columns = st.session_state.df.select_dtypes(include=['int64', 'float64']).columns.tolist()
 
-        #Selecting the columns for plotting(Categorical)
+        #Selecting the columns for plotting (Categorical)
         st.sidebar.subheader('Graph for Categorical Columns')
-        st.sidebar.write('Select the x-axis and y-axis for plotting the bar graph. The x-axis consists of  numerical column and the y-axis consists of categorical columns selected.')
-        x_feature_category = st.sidebar.selectbox('X-axis', options=numerical_columns , key='x_feature_category')
-        y_feature_category = st.sidebar.selectbox('Y-axis(Categories)', options=categorical_columns , key='y_feature_category')
+        st.sidebar.write('Select the x-axis and y-axis for plotting the bar graph. The x-axis consists of numerical column and the y-axis consists of categorical columns selected.')
+        x_feature_category = st.sidebar.selectbox('X-axis', options=numerical_columns, key='x_feature_category')
+        y_feature_category = st.sidebar.selectbox('Y-axis(Categories)', options=categorical_columns, key='y_feature_category')
 
         #Bar Graph for Categorical Columns
-        if st.sidebar.button('Plot Data' , key='plot_data_category'):
+        if st.sidebar.button('Plot Data', key='plot_data_category'):
             st.subheader('Plotting Area')
             if x_feature_category and y_feature_category:
                 fig = plt.figure()
                 sns.barplot(x=x_feature_category, y=y_feature_category, data=st.session_state.df)
                 st.pyplot(fig)
 
-
-        #Selecting the columns for plotting(Numerical)
+        #Selecting the columns for plotting (Numerical)
         st.sidebar.subheader('Graph for Numerical Columns')
-        st.sidebar.write('Select the x-axis and y-axis for plotting the graph. The x-axis and y-axis consists of numerical columns selected. you can select the type of graph you want to plot.')
-        x_feature_numeric = st.sidebar.selectbox('X-axis', options=numerical_columns , key='x_feature_numeric')
-        y_feature_numeric = st.sidebar.selectbox('Y-axis', options=numerical_columns , key='y_feature_numeric')
+        st.sidebar.write('Select the x-axis and y-axis for plotting the graph. The x-axis and y-axis consists of numerical columns selected. You can select the type of graph you want to plot.')
+        x_feature_numeric = st.sidebar.selectbox('X-axis', options=numerical_columns, key='x_feature_numeric')
+        y_feature_numeric = st.sidebar.selectbox('Y-axis', options=numerical_columns, key='y_feature_numeric')
         graph_type = st.sidebar.selectbox('Graph Type', options=['Scatter Plot', 'Line Plot', 'Bar Plot'])
 
         #Different Graphs for Numerical Columns
-        if st.sidebar.button('Plot Data' , key='plot_data_numeric'):
+        if st.sidebar.button('Plot Data', key='plot_data_numeric'):
             st.subheader('Plotting Area')
             if x_feature_numeric and y_feature_numeric:
                 if graph_type == 'Scatter Plot':
@@ -225,24 +218,336 @@ def main():
                     fig = plt.figure()
                     sns.scatterplot(x=x_feature_numeric, y=y_feature_numeric, data=st.session_state.df)
                     st.pyplot(fig)
-
                 elif graph_type == 'Line Plot':
                     st.write('Line Plot')
                     fig = plt.figure()
                     sns.lineplot(x=x_feature_numeric, y=y_feature_numeric, data=st.session_state.df)
                     st.pyplot(fig)
-
                 elif graph_type == 'Bar Plot':
                     st.write('Bar Plot')
                     fig = plt.figure()
                     sns.barplot(x=x_feature_numeric, y=y_feature_numeric, data=st.session_state.df)
                     st.pyplot(fig)
-
                 else:
                     st.write('Invalid Graph Type')
 
-        st.sidebar.markdown("""---""") 
-        
+        st.sidebar.markdown("""---""")
+
+        # ─────────────────────────────────────────────
+        # FEATURE 1: Pie / Donut Chart
+        # ─────────────────────────────────────────────
+        st.sidebar.header('Pie / Donut Chart 🥧')
+        st.sidebar.write(
+            'Visualize the distribution of a categorical (or low-cardinality) column as a '
+            'Pie or Donut chart. Columns with more than 15 unique values are hidden to keep '
+            'the chart readable.'
+        )
+
+        pie_eligible_columns = [
+            col for col in st.session_state.df.columns
+            if st.session_state.df[col].nunique(dropna=True) <= 15
+        ]
+
+        if pie_eligible_columns:
+            pie_column = st.sidebar.selectbox(
+                'Select Column for Chart',
+                options=pie_eligible_columns,
+                key='pie_column'
+            )
+            chart_style = st.sidebar.radio(
+                'Chart Style',
+                options=['Pie Chart', 'Donut Chart'],
+                key='chart_style'
+            )
+            show_percentages = st.sidebar.checkbox(
+                'Show Percentages on Chart', value=True, key='show_percentages'
+            )
+            show_legend = st.sidebar.checkbox(
+                'Show Legend', value=True, key='show_legend'
+            )
+            max_slices = st.sidebar.slider(
+                'Max categories to display (rest grouped as "Other")',
+                min_value=2,
+                max_value=15,
+                value=10,
+                key='max_slices'
+            )
+
+            if st.sidebar.button('Plot Pie / Donut Chart', key='plot_pie_chart'):
+                st.subheader(f'{chart_style} — Distribution of "{pie_column}"')
+
+                value_counts = (
+                    st.session_state.df[pie_column]
+                    .dropna()
+                    .astype(str)
+                    .value_counts()
+                )
+
+                if len(value_counts) > max_slices:
+                    top_counts   = value_counts.iloc[:max_slices]
+                    other_count  = value_counts.iloc[max_slices:].sum()
+                    value_counts = pd.concat(
+                        [top_counts, pd.Series({'Other': other_count})]
+                    )
+
+                labels  = value_counts.index.tolist()
+                sizes   = value_counts.values.tolist()
+                colours = plt.cm.Set3.colors[:len(labels)]
+
+                fig, ax = plt.subplots(figsize=(8, 6))
+
+                wedge_props = {}
+                if chart_style == 'Donut Chart':
+                    wedge_props = {'width': 0.55}
+
+                autopct_fmt = '%1.1f%%' if show_percentages else None
+
+                wedges, texts, autotexts = ax.pie(
+                    sizes,
+                    labels=labels,
+                    autopct=autopct_fmt,
+                    colors=colours,
+                    startangle=140,
+                    wedgeprops=wedge_props,
+                    pctdistance=0.75 if chart_style == 'Donut Chart' else 0.6,
+                )
+
+                if show_percentages:
+                    for autotext in autotexts:
+                        autotext.set_fontsize(9)
+                        autotext.set_color('black')
+
+                if chart_style == 'Donut Chart':
+                    total = sum(sizes)
+                    ax.text(
+                        0, 0,
+                        f'Total\n{total:,}',
+                        ha='center', va='center',
+                        fontsize=12, fontweight='bold', color='#333333'
+                    )
+
+                if show_legend:
+                    ax.legend(
+                        wedges, labels,
+                        title=pie_column,
+                        loc='center left',
+                        bbox_to_anchor=(1, 0, 0.5, 1),
+                        fontsize=9
+                    )
+
+                ax.set_title(
+                    f'{chart_style}: {pie_column}',
+                    fontsize=14, fontweight='bold', pad=20
+                )
+                ax.axis('equal')
+                plt.tight_layout()
+                st.pyplot(fig)
+
+                st.write('**Value Counts Table:**')
+                freq_df = pd.DataFrame({
+                    'Category'  : labels,
+                    'Count'     : sizes,
+                    'Percentage': [f'{(s / sum(sizes)) * 100:.1f}%' for s in sizes]
+                })
+                st.dataframe(freq_df, use_container_width=True)
+
+        else:
+            st.sidebar.warning(
+                'No suitable columns found. Pie/Donut charts require columns '
+                'with 15 or fewer unique values.'
+            )
+
+        st.sidebar.markdown("""---""")
+        # ─────────────────────────────────────────────
+        # END FEATURE 1
+        # ─────────────────────────────────────────────
+
+
+        # ─────────────────────────────────────────────
+        # FEATURE 2: Histogram with KDE Overlay
+        # ─────────────────────────────────────────────
+        st.sidebar.header('Histogram with KDE Overlay 📈')
+        st.sidebar.write(
+            'A histogram shows the frequency distribution of a numerical column. '
+            'The KDE (Kernel Density Estimate) curve overlaid on top reveals the '
+            'overall shape of the distribution — whether it is normal, skewed, '
+            'bimodal, etc.'
+        )
+
+        if numerical_columns:
+            hist_column = st.sidebar.selectbox(
+                'Select Numerical Column',
+                options=numerical_columns,
+                key='hist_column'
+            )
+            hist_bins = st.sidebar.slider(
+                'Number of Bins',
+                min_value=5,
+                max_value=100,
+                value=30,
+                step=5,
+                key='hist_bins'
+            )
+            hist_color = st.sidebar.color_picker(
+                'Bar Colour', value='#4C72B0', key='hist_color'
+            )
+            kde_color = st.sidebar.color_picker(
+                'KDE Line Colour', value='#DD4444', key='kde_color'
+            )
+            show_kde = st.sidebar.checkbox(
+                'Show KDE Curve', value=True, key='show_kde'
+            )
+            show_mean_median = st.sidebar.checkbox(
+                'Show Mean & Median Lines', value=True, key='show_mean_median'
+            )
+
+            # Optional: group KDE by a categorical column
+            all_cat_cols = st.session_state.df.select_dtypes(
+                include=['object', 'category', 'bool']
+            ).columns.tolist()
+            low_card_cat_cols = [
+                c for c in all_cat_cols
+                if st.session_state.df[c].nunique(dropna=True) <= 8
+            ]
+            group_options    = ['None'] + low_card_cat_cols
+            hist_group_by = st.sidebar.selectbox(
+                'Group KDE by Category (optional)',
+                options=group_options,
+                key='hist_group_by'
+            )
+
+            if st.sidebar.button('Plot Histogram + KDE', key='plot_histogram'):
+                st.subheader(f'Histogram with KDE — "{hist_column}"')
+
+                col_data = st.session_state.df[hist_column].dropna()
+
+                if col_data.empty:
+                    st.warning('The selected column has no valid (non-null) data to plot.')
+                else:
+                    fig, ax = plt.subplots(figsize=(10, 5))
+
+                    if hist_group_by == 'None':
+                        # Plain histogram
+                        ax.hist(
+                            col_data,
+                            bins=hist_bins,
+                            color=hist_color,
+                            edgecolor='white',
+                            alpha=0.75,
+                            density=show_kde,   # normalise y-axis so KDE scale matches
+                            label='Frequency'
+                        )
+
+                        # KDE curve
+                        if show_kde:
+                            from scipy.stats import gaussian_kde
+                            kde = gaussian_kde(col_data)
+                            x_range = np.linspace(col_data.min(), col_data.max(), 300)
+                            ax.plot(
+                                x_range, kde(x_range),
+                                color=kde_color, linewidth=2.5, label='KDE'
+                            )
+                            ax.set_ylabel('Density')
+                        else:
+                            ax.set_ylabel('Frequency')
+
+                    else:
+                        # Grouped KDE — one curve per category
+                        from scipy.stats import gaussian_kde
+
+                        palette = sns.color_palette('tab10')
+                        groups  = st.session_state.df[hist_group_by].dropna().unique()
+
+                        # Muted base histogram for the full column
+                        ax.hist(
+                            col_data,
+                            bins=hist_bins,
+                            color='lightgrey',
+                            edgecolor='white',
+                            alpha=0.5,
+                            density=True,
+                            label='All data'
+                        )
+
+                        for idx, grp in enumerate(groups):
+                            grp_data = st.session_state.df.loc[
+                                st.session_state.df[hist_group_by] == grp, hist_column
+                            ].dropna()
+                            if len(grp_data) < 2:
+                                continue
+                            kde = gaussian_kde(grp_data)
+                            x_range = np.linspace(col_data.min(), col_data.max(), 300)
+                            ax.plot(
+                                x_range, kde(x_range),
+                                color=palette[idx % len(palette)],
+                                linewidth=2, label=str(grp)
+                            )
+
+                        ax.set_ylabel('Density')
+
+                    # Mean & Median vertical lines
+                    if show_mean_median:
+                        mean_val   = col_data.mean()
+                        median_val = col_data.median()
+                        ax.axvline(
+                            mean_val, color='green', linestyle='--',
+                            linewidth=1.8, label=f'Mean: {mean_val:.2f}'
+                        )
+                        ax.axvline(
+                            median_val, color='orange', linestyle='-.',
+                            linewidth=1.8, label=f'Median: {median_val:.2f}'
+                        )
+
+                    ax.set_xlabel(hist_column, fontsize=12)
+                    ax.set_title(
+                        f'Distribution of {hist_column}',
+                        fontsize=14, fontweight='bold'
+                    )
+                    ax.legend(fontsize=9)
+                    sns.despine(ax=ax)
+                    plt.tight_layout()
+                    st.pyplot(fig)
+
+                    # Summary statistics below the chart
+                    st.write('**Distribution Summary:**')
+                    summary = pd.DataFrame({
+                        'Statistic': ['Count', 'Mean', 'Median', 'Std Dev',
+                                      'Min', '25%', '75%', 'Max',
+                                      'Skewness', 'Kurtosis'],
+                        'Value': [
+                            f'{col_data.count():,}',
+                            f'{col_data.mean():.4f}',
+                            f'{col_data.median():.4f}',
+                            f'{col_data.std():.4f}',
+                            f'{col_data.min():.4f}',
+                            f'{col_data.quantile(0.25):.4f}',
+                            f'{col_data.quantile(0.75):.4f}',
+                            f'{col_data.max():.4f}',
+                            f'{col_data.skew():.4f}',
+                            f'{col_data.kurt():.4f}',
+                        ]
+                    })
+                    st.dataframe(summary, use_container_width=True)
+
+                    # Skewness interpretation hint
+                    skew_val = col_data.skew()
+                    if abs(skew_val) < 0.5:
+                        skew_msg = '✅ The distribution is approximately **symmetric**.'
+                    elif skew_val >= 0.5:
+                        skew_msg = '⚠️ The distribution is **right-skewed** (positive skew) — a long tail on the right.'
+                    else:
+                        skew_msg = '⚠️ The distribution is **left-skewed** (negative skew) — a long tail on the left.'
+                    st.info(skew_msg)
+
+        else:
+            st.sidebar.warning('No numerical columns found for histogram.')
+
+        st.sidebar.markdown("""---""")
+        # ─────────────────────────────────────────────
+        # END FEATURE 2
+        # ─────────────────────────────────────────────
+
+
         #Plotting clusters in a column
         st.sidebar.header('Clustering')
         st.sidebar.write('Clustering is the task of dividing the population or data points into a number of groups such that data points in the same groups are more similar to other data points in the same group than those in other groups. The number of clusters to be formed can be selected by the user.')
@@ -252,35 +557,40 @@ def main():
             st.subheader('Clusters')
             if cluster_column:
                 from sklearn.cluster import KMeans
+
+                st.session_state.df = st.session_state.df[np.isfinite(st.session_state.df[cluster_column])]
+                st.session_state.df = st.session_state.df.dropna(subset=[cluster_column])
+
                 kmeans = KMeans(n_clusters=n_clusters)
                 st.session_state.df['Cluster'] = kmeans.fit_predict(st.session_state.df[[cluster_column]])
                 fig = plt.figure()
-                sns.scatterplot(x=cluster_column, y= cluster_column, hue='Cluster', data=st.session_state.df)
+                sns.scatterplot(x=cluster_column, y=cluster_column, hue='Cluster', data=st.session_state.df)
                 st.pyplot(fig)
 
-        st.sidebar.markdown("""---""") 
+        st.sidebar.markdown("""---""")
+
         #Regression Plot
         st.sidebar.header('Regression Plot')
         st.sidebar.write('Regression analysis is a form of predictive modelling technique which investigates the relationship between a dependent and independent variable. The regression plot can be used to visualize the relationship between the dependent and independent variable.')
-        x_feature_regression = st.sidebar.selectbox('X-axis', options=numerical_columns , key='x_feature_regression')
-        y_feature_regression = st.sidebar.selectbox('Y-axis', options=numerical_columns , key='y_feature_regression')
+        x_feature_regression = st.sidebar.selectbox('X-axis', options=numerical_columns, key='x_feature_regression')
+        y_feature_regression = st.sidebar.selectbox('Y-axis', options=numerical_columns, key='y_feature_regression')
         if st.sidebar.button('Plot Regression', key='plot_regression'):
-            st.write("Please Note the regression plot may not be exact for the choosen valiables due to the presence of outliers. The outliers can be detected using the outlier detection feature and removed outside the app. This regression plot shows the general trend between the variables.")
+            st.write("Please Note the regression plot may not be exact for the chosen variables due to the presence of outliers. The outliers can be detected using the outlier detection feature and removed outside the app. This regression plot shows the general trend between the variables.")
             st.subheader('Regression Plot')
             if x_feature_regression and y_feature_regression:
                 fig = plt.figure()
                 sns.regplot(x=x_feature_regression, y=y_feature_regression, data=st.session_state.df)
                 st.pyplot(fig)
-        
-        #Display the entire datase
-        st.sidebar.markdown("""---""") 
+
+        #Display the entire dataset
+        st.sidebar.markdown("""---""")
         if st.sidebar.button('View and Download Entire Dataset', key='view_dataset'):
             st.write('Viewing the entire dataset')
             st.write(st.session_state.df)
             st.markdown(get_table_download_link(st.session_state.df), unsafe_allow_html=True)
-        
 
-    st.sidebar.markdown("""---""") 
+
+    st.sidebar.markdown("""---""")
 
 # Call the main function directly
 if __name__ == "__main__":
