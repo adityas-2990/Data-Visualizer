@@ -16,9 +16,3 @@ To run the app locally:
      streamlit run src/app.py
      ```
 
-The Dataset used to test the app is in the dataset directory.
-The project report can be found int the docs directory
-
-
-
-THIS PROJECT WAS MADE FOR THE INTEL UNNATI INDUSTRIAL TRAINING PROGRAMME.
